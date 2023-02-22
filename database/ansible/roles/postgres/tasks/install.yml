@@ -1,0 +1,22 @@
+# https://weblabo.oscasierra.net/postgresql10-centos7-install/
+# https://qiita.com/kouynhr02/items/f60b2f720b5cb731c6a8
+- name: add postgresql repository
+  yum: name={{repository}}
+
+# python-psycopg2 はpostgresqlをansibleで操作するために必要
+- name: install
+  yum:
+    name:
+      - python-psycopg2
+      - postgresql{{version}}-server
+
+- name: initdb
+  command:
+    cmd: /usr/pgsql-{{version}}/bin/postgresql-{{version}}-setup initdb
+
+- name: start postgresql
+  service:
+    name: postgresql-{{version}}
+    state: started
+    enabled: yes
+  

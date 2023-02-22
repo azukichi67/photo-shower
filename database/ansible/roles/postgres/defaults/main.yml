@@ -1,0 +1,5 @@
+version: 14
+repository: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+db_name: photo-shower
+user_name: testuser
+password: photo!shower

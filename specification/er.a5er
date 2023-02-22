@@ -29,6 +29,8 @@ FooterRight=
 ShowPageoutRelation=1
 RDBMSType=6
 RDBMSTypeName=PostgreSQL
+CreateFk=1
+FkOnDeleteOption=on delete cascade
 DefaultPkName=%0:s_PKC
 DefaultPkIndexName=%0:s_PKI
 DefaultIndexName=%0:s_IX%1:d
@@ -62,7 +64,7 @@ PName=images
 LName=画像
 Comment=
 TableOption=
-Page=Main
+Page=MAIN
 Left=1100
 Top=400
 Field="","image_id","serial","NOT NULL",0,"","",$FFFFFFFF,""
@@ -74,7 +76,7 @@ EffectMode=None
 Color=$000000
 BkColor=$FFFFFF
 ModifiedDateTime=20230219104029
-Position="Main",1100,400
+Position="MAIN",1100,400
 ZOrder=2
 
 [Relation]

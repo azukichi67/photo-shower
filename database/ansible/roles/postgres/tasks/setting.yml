@@ -1,0 +1,23 @@
+# https://docs.ansible.com/ansible/2.9_ja/modules/blockinfile_module.html#blockinfile-module
+- name: edit postgresql.conf
+  become: yes
+  become_user: postgres
+  blockinfile:
+    path: /var/lib/pgsql/{{version}}/data/postgresql.conf
+    block: |
+      listen_addresses = '*'
+
+- name: edit pg_hba.conf
+  become: yes
+  become_user: postgres
+  blockinfile:
+    path: /var/lib/pgsql/{{version}}/data/pg_hba.conf
+    insertafter:  '^# TYPE'
+    block: |
+      host all {{user_name}} 0.0.0.0/0 md5
+      host all {{user_name}} ::0/0 md5
+
+- name: restart postgresql
+  service:
+    name: postgresql-{{version}}
+    state: restarted
