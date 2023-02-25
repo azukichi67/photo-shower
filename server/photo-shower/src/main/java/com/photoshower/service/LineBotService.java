@@ -1,15 +1,10 @@
 package com.photoshower.service;
 
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.linecorp.bot.client.LineBlobClient;
@@ -25,9 +20,7 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.profile.UserProfileResponse;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
-import com.photoshower.domain.Image;
 import com.photoshower.domain.User;
-import com.photoshower.repository.ImageRepository;
 import com.photoshower.repository.UserRepository;
 
 /**
@@ -37,14 +30,11 @@ import com.photoshower.repository.UserRepository;
 @Service
 public class LineBotService {
 
-    @Value("${photoshower.image-output-path}")
-    private String outputPath;
-
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private ImageRepository imageRepository;
+    private ImageService imageService;
 
     @Autowired
     private LineMessagingClient lineMessagingClient;
@@ -54,31 +44,24 @@ public class LineBotService {
 
     @EventMapping
     public void handleTextMessageEvent(MessageEvent<TextMessageContent> event) throws Exception {
+
+        String userId = event.getSource().getUserId();
+        saveUser(userId);
+
         reply(event.getReplyToken(), "表示させたい写真を送ってください！");
     }
 
-    // TODO @Transactional 付けたらLine側でエラーになった
     @EventMapping
     public void handleImageMessage(MessageEvent<ImageMessageContent> event) throws Exception {
 
-        String userId = userIdFrom(event);
-
-        // TODO Returningでクラスごと返したらなぜかnullになった
-        int imageId = imageRepository.insert(
-                Image.builder()
-                        .userId(userId)
-                        .build());
+        String userId = event.getSource().getUserId();
+        saveUser(userId);
 
         ImageMessageContent message = event.getMessage();
         MessageContentResponse response = lineBlobClient.getMessageContent(message.getId()).get();
 
-        Path output = Paths.get(outputPath);
-        if (!Files.exists(output)) {
-            Files.createDirectory(output);
-        }
         try (InputStream is = response.getStream()) {
-            Path file = Files.createFile(output.resolve(String.valueOf(imageId)));
-            Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
+            imageService.saveImage(userId, is);
         }
 
         reply(event.getReplyToken(), "写真を登録しました！");
@@ -89,9 +72,8 @@ public class LineBotService {
         System.out.println("Get event");
     }
 
-    private String userIdFrom(Event event) throws InterruptedException, ExecutionException {
+    private void saveUser(String userId) throws InterruptedException, ExecutionException {
 
-        String userId = event.getSource().getUserId();
         User user = userRepository.select(userId);
 
         if (user == null) {
@@ -102,8 +84,6 @@ public class LineBotService {
                             .name(userProfileResponse.getDisplayName())
                             .build());
         }
-
-        return userId;
     }
 
     private void reply(String replyToken, String message) {

@@ -1,7 +1,5 @@
 package com.photoshower.domain;
 
-import java.time.OffsetDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +16,4 @@ public class Image {
     private String userId;
 
     private boolean isUsed;
-
-    private OffsetDateTime createAt;
 }
