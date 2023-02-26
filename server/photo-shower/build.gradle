@@ -24,7 +24,6 @@ dependencies {
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0'
 
 	implementation group: 'com.linecorp.bot', name: 'line-bot-spring-boot', version: '6.0.0'
-	implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'

@@ -34,6 +34,11 @@ public class ImageService {
     public String getNextUnusedImagePath() {
 
         Image image = imageRepository.selectUnusedImage();
+
+        if (image == null) {
+            return null;
+        }
+
         int imageId = image.getImageId();
         imageRepository.updateToUsed(imageId);
 
