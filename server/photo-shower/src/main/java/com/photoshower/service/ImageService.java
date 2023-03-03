@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,10 +29,11 @@ public class ImageService {
     private String outputPath;
 
     /**
-     * 次の未使用の画像ファイルパスを返します。
-     * @return 未使用の画像ファイルパス
+     * 次の未使用の画像ファイルのデータ（Base64）を返します。
+     * @return 未使用の画像ファイルのデータ（Base64）
+     * @throws IOException 
      */
-    public String getNextUnusedImagePath() {
+    public String getNextUnusedImageData() throws IOException {
 
         Image image = imageRepository.selectUnusedImage();
 
@@ -42,7 +44,10 @@ public class ImageService {
         int imageId = image.getImageId();
         imageRepository.updateToUsed(imageId);
 
-        return "%s\\%s".formatted(outputPath, String.valueOf(imageId));
+        Path filePath = Path.of("%s\\%s".formatted(outputPath, String.valueOf(imageId)));
+        try (InputStream is = Files.newInputStream(filePath)) {
+            return Base64.getEncoder().encodeToString(is.readAllBytes());
+        }
     }
 
     /**
