@@ -2,33 +2,31 @@
 
 actor User
 participant LINEBOT
-participant ngrok
-participant "Client (TODO)" as Client
+participant "Client (React)" as Client
 participant "Server (Spring Boot)" as Server
 database "DB (PostgreSQL)" as DB
 
 == register a image ==
 
 User -> LINEBOT: send a image
-LINEBOT -> ngrok: webhook
-ngrok -> Server: tunneling
+LINEBOT -> Server: webhook
 Server -> Server: save a image
-Server -> DB: save a image path
+Server -> DB: save a image id
 activate DB
-Server --> ngrok: send a message
-ngrok --> LINEBOT
-LINEBOT --> User
+Server -> LINEBOT: send a message
+LINEBOT -> User
 
 == show a image ==
 
 User -> Client: start
 activate Client
 loop every 10 seconds
-Client -> Server: GET image-path
-Server -> DB: SELECT image-path
+Client -> Server: GET api/image
+Server -> DB: SELECT image_id
 DB --> Server
 deactivate DB
-Server --> Client: image-path
+Server -> Server: convert image file to Base64
+Server --> Client: image data (Base64)
 Client --> User: show a image
 end
 deactivate Client
