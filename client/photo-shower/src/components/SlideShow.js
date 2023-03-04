@@ -13,7 +13,7 @@ function SlideShow() {
     useEffect(() => {
         const intervalId = setInterval(() => {
             axios
-                .get("/api/image")
+                .get("/api/images/next-image")
                 .then((result) => {
                     const imageData = result.data;
                     if (imageData) {

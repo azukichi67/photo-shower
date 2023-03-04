@@ -13,13 +13,13 @@ import com.photoshower.service.ImageService;
  * Imageのコントローラです。
  */
 @RestController
-@RequestMapping("api/image")
+@RequestMapping("api/images")
 public class ImageController {
 
     @Autowired
     private ImageService imageService;
 
-    @GetMapping()
+    @GetMapping("/next-image")
     public String getNextUnusedImageData() throws IOException {
         return imageService.getNextUnusedImageData();
     }
